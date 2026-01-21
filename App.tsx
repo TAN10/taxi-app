@@ -6,12 +6,9 @@ import {
   Users, 
   LogOut,
   Bell,
-  Search,
   Settings as SettingsIcon,
-  ShieldCheck,
   CheckCircle2,
-  AlertCircle,
-  X
+  AlertCircle
 } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Trips from './pages/Trips';
@@ -86,6 +83,15 @@ const AppContent = () => {
     return saved ? JSON.parse(saved) : INITIAL_TRIPS;
   });
 
+  // Handle Global Dark Mode Class
+  useEffect(() => {
+    if (settings.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [settings.darkMode]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
@@ -132,9 +138,9 @@ const AppContent = () => {
   }
 
   return (
-    <div className={`flex min-h-screen ${settings.darkMode ? 'dark bg-slate-950' : 'bg-slate-50'}`}>
+    <div className="flex min-h-screen transition-colors duration-300">
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col fixed h-full z-20 shadow-sm transition-colors duration-300">
+      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col fixed h-full z-40 shadow-sm transition-colors duration-300">
         <div className="flex items-center space-x-3 px-2 mb-10">
            <div className="p-2 bg-blue-600 rounded-lg text-white">
              <Car size={20} />
@@ -168,8 +174,8 @@ const AppContent = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 min-h-screen relative transition-colors duration-300">
-        <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-30">
+      <main className="flex-1 ml-64 min-h-screen relative transition-colors duration-300 bg-slate-50 dark:bg-slate-950">
+        <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
           <div className="flex items-center space-x-4">
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
               {location.pathname === '/' ? 'Overview' : location.pathname.substring(1)}
@@ -179,20 +185,24 @@ const AppContent = () => {
             <div className="relative" ref={notificationRef}>
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative"
+                className={`p-2 rounded-full transition-all relative ${
+                  isNotificationsOpen 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
+                    : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
               >
                 <Bell size={20} />
-                {unreadCount > 0 && (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900"></span>
+                {unreadCount > 0 && !isNotificationsOpen && (
+                  <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
                 )}
               </button>
 
               {/* Notification Dropdown */}
               {isNotificationsOpen && (
-                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
+                  <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
                     <h3 className="font-bold text-slate-900 dark:text-white">Notifications</h3>
-                    <button onClick={markAllRead} className="text-[10px] font-bold text-blue-600 uppercase hover:underline">Mark all as read</button>
+                    <button onClick={markAllRead} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase hover:underline">Mark all read</button>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
                     {notifications.length > 0 ? (
@@ -200,18 +210,18 @@ const AppContent = () => {
                         <div key={notif.id} className={`p-4 border-b border-slate-50 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${!notif.read ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
                           <div className="flex items-start space-x-3">
                             <div className={`p-1.5 rounded-lg mt-0.5 ${
-                              notif.type === 'success' ? 'bg-emerald-100 text-emerald-600' : 
-                              notif.type === 'warning' ? 'bg-amber-100 text-amber-600' : 
-                              'bg-blue-100 text-blue-600'
+                              notif.type === 'success' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 
+                              notif.type === 'warning' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' : 
+                              'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                             }`}>
                               {notif.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                               <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{notif.title}</p>
                               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">{notif.message}</p>
-                              <p className="text-[10px] text-slate-400 mt-2 font-medium">{notif.time}</p>
+                              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">{notif.time}</p>
                             </div>
-                            {!notif.read && <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-1.5"></div>}
+                            {!notif.read && <div className="w-2 h-2 bg-blue-600 rounded-full mt-1.5 shrink-0"></div>}
                           </div>
                         </div>
                       ))
