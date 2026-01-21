@@ -1,0 +1,7 @@
+{
+  "name": "Copy of TaxiManager Pro",
+  "description": "A comprehensive corporate taxi and Uber expense management system for tracking employee trips, generating AI insights, and managing departmental travel budgets.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
