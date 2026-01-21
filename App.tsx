@@ -38,9 +38,9 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 const MOCK_NOTIFICATIONS = [
-  { id: 1, title: 'Trip Approved', message: 'Sarah Chen\'s trip to Tech Park has been approved.', time: '2 mins ago', type: 'success', read: false },
-  { id: 2, title: 'Budget Alert', message: 'Monthly travel budget has reached 80%.', time: '1 hour ago', type: 'warning', read: false },
-  { id: 3, title: 'New Employee', message: 'Elena Rodriguez was added to the Marketing team.', time: '3 hours ago', type: 'info', read: true },
+  { id: 1, title: 'Trip Approved', message: 'Sarah Chen\'s trip to Tech Park has been approved.', time: '2 mins ago', type: 'success' },
+  { id: 2, title: 'Budget Alert', message: 'Monthly travel budget has reached 80%.', time: '1 hour ago', type: 'warning' },
+  { id: 3, title: 'New Employee', message: 'Elena Rodriguez was added to the Marketing team.', time: '3 hours ago', type: 'info' },
 ];
 
 const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: string, to: string, active: boolean }) => (
@@ -61,7 +61,7 @@ const AppContent = () => {
   const location = useLocation();
   const notificationRef = useRef<HTMLDivElement>(null);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [notifications] = useState(MOCK_NOTIFICATIONS);
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('tm_user');
@@ -83,12 +83,14 @@ const AppContent = () => {
     return saved ? JSON.parse(saved) : INITIAL_TRIPS;
   });
 
-  // Handle Global Dark Mode Class
+  // Handle Global Dark Mode Class with state persistence
   useEffect(() => {
     if (settings.darkMode) {
       document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
     }
   }, [settings.darkMode]);
 
@@ -127,18 +129,12 @@ const AppContent = () => {
     }
   };
 
-  const markAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-  };
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
   if (!currentUser) {
     return <Login onLogin={setCurrentUser} />;
   }
 
   return (
-    <div className="flex min-h-screen transition-colors duration-300">
+    <div className="flex min-h-screen transition-colors duration-300 dark:bg-slate-950">
       {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col fixed h-full z-40 shadow-sm transition-colors duration-300">
         <div className="flex items-center space-x-3 px-2 mb-10">
@@ -192,7 +188,7 @@ const AppContent = () => {
                 }`}
               >
                 <Bell size={20} />
-                {unreadCount > 0 && !isNotificationsOpen && (
+                {!isNotificationsOpen && (
                   <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
                 )}
               </button>
@@ -201,13 +197,13 @@ const AppContent = () => {
               {isNotificationsOpen && (
                 <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
                   <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-                    <h3 className="font-bold text-slate-900 dark:text-white">Notifications</h3>
-                    <button onClick={markAllRead} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase hover:underline">Mark all read</button>
+                    <h3 className="font-bold text-slate-900 dark:text-white">Recent Activity</h3>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase">Updates</div>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
                     {notifications.length > 0 ? (
                       notifications.map(notif => (
-                        <div key={notif.id} className={`p-4 border-b border-slate-50 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${!notif.read ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
+                        <div key={notif.id} className="p-4 border-b border-slate-50 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                           <div className="flex items-start space-x-3">
                             <div className={`p-1.5 rounded-lg mt-0.5 ${
                               notif.type === 'success' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 
@@ -221,14 +217,13 @@ const AppContent = () => {
                               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">{notif.message}</p>
                               <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">{notif.time}</p>
                             </div>
-                            {!notif.read && <div className="w-2 h-2 bg-blue-600 rounded-full mt-1.5 shrink-0"></div>}
                           </div>
                         </div>
                       ))
                     ) : (
                       <div className="p-8 text-center text-slate-400">
                         <Bell size={32} className="mx-auto mb-2 opacity-20" />
-                        <p className="text-sm font-medium">No new notifications</p>
+                        <p className="text-sm font-medium">No new updates</p>
                       </div>
                     )}
                   </div>
