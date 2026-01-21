@@ -10,6 +10,22 @@ export interface Employee {
   avatar?: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+}
+
+export interface AppSettings {
+  currency: 'USD' | 'EUR' | 'GBP';
+  autoAI: boolean;
+  darkMode: boolean;
+  companyName: string;
+  monthlyBudget: number;
+}
+
 export interface Trip {
   id: string;
   employeeId: string;
