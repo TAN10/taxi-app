@@ -2,9 +2,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Trip, TripCategory } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// We initialize the AI instance using the environment variable. 
+// If process.env.API_KEY is defined in your hosting provider (Vercel/Netlify), 
+// it will be injected here.
+const getAI = () => {
+  const apiKey = process.env.API_KEY || "";
+  return new GoogleGenAI({ apiKey });
+};
 
 export const getTripInsights = async (trips: Trip[]) => {
+  const ai = getAI();
   const prompt = `
     Analyze the following taxi trip data for employees and provide a summary of spending patterns, 
     potential areas for cost-saving, and any unusual activity.
@@ -22,11 +29,12 @@ export const getTripInsights = async (trips: Trip[]) => {
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "Failed to generate AI insights. Please check your connection.";
+    return "AI insights currently unavailable. Please check your API configuration.";
   }
 };
 
 export const suggestTripDetails = async (pickup: string, dropoff: string) => {
+  const ai = getAI();
   const prompt = `Based on a trip from "${pickup}" to "${dropoff}", suggest a likely business purpose and category.`;
   
   try {
