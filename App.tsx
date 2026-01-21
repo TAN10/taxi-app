@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Car, 
   Users, 
-  PlusCircle, 
   LogOut,
   Bell,
   Search,
@@ -42,55 +40,15 @@ const DEFAULT_SETTINGS: AppSettings = {
 const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: string, to: string, active: boolean }) => (
   <Link 
     to={to} 
-    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
       active 
-        ? 'bg-blue-600 text-white shadow-md' 
-        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 translate-x-1' 
+        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
     }`}
   >
     <Icon size={20} />
-    <span className="font-medium">{label}</span>
+    <span className="font-semibold">{label}</span>
   </Link>
-);
-
-const Navbar = ({ user }: { user: User }) => (
-  <header className="h-16 border-b border-slate-200 bg-white px-8 flex items-center justify-between sticky top-0 z-10">
-    <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2">
-        <div className="bg-blue-600 p-1.5 rounded-lg shadow-blue-200 shadow-md">
-           <Car className="text-white" size={20} />
-        </div>
-        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          TaxiManager Pro
-        </h1>
-      </div>
-      <div className="hidden lg:flex relative ml-8">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-        <input 
-          type="text" 
-          placeholder="Search records..." 
-          className="pl-10 pr-4 py-2 border border-slate-200 rounded-full bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-sm"
-        />
-      </div>
-    </div>
-    <div className="flex items-center space-x-5">
-      <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-        <Bell size={20} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-      </button>
-      <div className="flex items-center space-x-3 pl-5 border-l border-slate-200">
-        <div className="text-right hidden sm:block">
-          <p className="text-sm font-semibold">{user.name}</p>
-          <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{user.role}</p>
-        </div>
-        <img 
-          src={user.avatar} 
-          alt="Avatar" 
-          className="w-10 h-10 rounded-full ring-2 ring-slate-100 object-cover"
-        />
-      </div>
-    </div>
-  </header>
 );
 
 const AppContent = () => {
@@ -114,6 +72,10 @@ const AppContent = () => {
     const saved = localStorage.getItem('tm_trips');
     return saved ? JSON.parse(saved) : INITIAL_TRIPS;
   });
+
+  useEffect(() => {
+    console.log("TaxiManager Pro Mounted. Current User:", currentUser?.name || 'None');
+  }, []);
 
   useEffect(() => {
     if (currentUser) localStorage.setItem('tm_user', JSON.stringify(currentUser));
@@ -145,35 +107,59 @@ const AppContent = () => {
   }
 
   return (
-    <div className={`flex min-h-screen bg-slate-50 ${settings.darkMode ? 'dark-mode-sim' : ''}`}>
+    <div className={`flex min-h-screen bg-slate-50 ${settings.darkMode ? 'dark bg-slate-950' : ''}`}>
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col fixed h-full">
-        <div className="flex items-center space-x-2 px-2 mb-6">
-           <ShieldCheck className="text-blue-600" size={24} />
-           <span className="font-bold text-slate-900">Admin Control</span>
+      <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col fixed h-full z-20 shadow-sm">
+        <div className="flex items-center space-x-3 px-2 mb-10">
+           <div className="p-2 bg-blue-600 rounded-lg text-white">
+             <Car size={20} />
+           </div>
+           <span className="font-bold text-lg text-slate-900">TaxiManager</span>
         </div>
         
-        <div className="space-y-2 flex-1 mt-4">
+        <div className="space-y-2 flex-1">
           <SidebarItem icon={LayoutDashboard} label="Dashboard" to="/" active={location.pathname === '/'} />
           <SidebarItem icon={Car} label="Trip History" to="/trips" active={location.pathname === '/trips'} />
           <SidebarItem icon={Users} label="Employees" to="/employees" active={location.pathname === '/employees'} />
           <SidebarItem icon={SettingsIcon} label="Settings" to="/settings" active={location.pathname === '/settings'} />
         </div>
 
-        <div className="pt-6 border-t border-slate-200">
+        <div className="pt-6 border-t border-slate-100">
+          <div className="flex items-center space-x-3 mb-6 px-2">
+            <img src={currentUser.avatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+            <div className="truncate">
+              <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
+              <p className="text-[10px] text-slate-400 truncate">{currentUser.role}</p>
+            </div>
+          </div>
           <button 
             onClick={handleLogout}
-            className="flex items-center space-x-3 text-slate-500 hover:text-red-500 hover:bg-red-50 px-4 py-3 rounded-lg w-full transition-all"
+            className="flex items-center space-x-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 px-4 py-3 rounded-xl w-full transition-all group font-semibold"
           >
-            <LogOut size={20} />
-            <span className="font-medium">Sign Out</span>
+            <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64">
-        <Navbar user={currentUser} />
+      <main className="flex-1 ml-64 min-h-screen relative">
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center space-x-4">
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+              {location.pathname === '/' ? 'Overview' : location.pathname.substring(1)}
+            </h2>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors relative">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            </button>
+            <div className="h-8 w-px bg-slate-200 mx-2"></div>
+            <p className="text-xs font-bold text-blue-600">{settings.companyName}</p>
+          </div>
+        </header>
+
         <div className="p-8">
           <Routes>
             <Route path="/" element={<Dashboard trips={trips} employees={employees} settings={settings} />} />
@@ -195,12 +181,10 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-};
+const App = () => (
+  <Router>
+    <AppContent />
+  </Router>
+);
 
 export default App;

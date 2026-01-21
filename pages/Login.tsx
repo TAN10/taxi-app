@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Car, Lock, Mail, ArrowRight } from 'lucide-react';
+import { Car, Lock, Mail, ArrowRight, Shield } from 'lucide-react';
 import { User } from '../types';
 
 interface LoginProps {
@@ -30,6 +29,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Version Badge */}
+      <div className="absolute top-6 right-6 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-white/40 font-mono tracking-widest uppercase">
+        Build v1.1-Stable
+      </div>
+
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 blur-[120px] rounded-full"></div>
@@ -87,9 +91,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-xs text-slate-500">
+          <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+            <div className="flex items-center space-x-1">
+              <Shield size={10} className="text-emerald-500" />
+              <span>Secure Login</span>
+            </div>
             <button className="hover:text-blue-400 transition-colors">Forgot Password?</button>
-            <button className="hover:text-blue-400 transition-colors">Request Access</button>
           </div>
         </div>
         
